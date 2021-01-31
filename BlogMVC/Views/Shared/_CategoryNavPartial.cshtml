@@ -1,0 +1,7 @@
+﻿@using BlogMVC.Models
+@model List<Category>
+
+@foreach (var item in Model)
+{
+    <li>@Html.ActionLink(item.Name,"Index","Category",new { categoryName = item.Name},null)</li>
+}

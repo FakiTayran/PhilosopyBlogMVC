@@ -1,0 +1,26 @@
+﻿@using BlogMVC.Models
+@model List<Article>
+
+<div class="block-1-2 block-m-full popular__posts">
+    @foreach (var article in Model.Take(6).OrderByDescending(x => x.Likes.Count()))
+    {
+        <article class="col-block popular__post">
+            <a href="@Url.Action("Index","Article",new { id = article.Id})" class="popular__thumb">
+                @if (!string.IsNullOrEmpty(article.PhotoPath))
+                {
+                    <img src="@article.PhotoPath" alt="@article.Title">
+                }
+                else
+                {
+                    <img src="~/images/empty.jpg" alt="@article.Title">
+
+                }
+            </a>
+            <h5><a href="@Url.Action("Index","Article",new { id = article.Id})">@article.Title</a></h5>
+            <section class="popular__meta">
+                <span class="popular__author"><span>By</span> <a href="#0">@article.ApplicationUser.NickName</a></span>
+                <span class="popular__date"><span>on</span> <time>@article.ArticleTime.Value.ToString("dddd, MMMM d, yyyy")</time></span>
+            </section>
+        </article>
+    }
+</div> <!-- end popular_posts -->

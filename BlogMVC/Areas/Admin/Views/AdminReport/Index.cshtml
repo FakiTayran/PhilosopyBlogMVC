@@ -1,0 +1,58 @@
+﻿@model List<Report>
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="container bg-white mt-5" style="overflow:scroll">
+    <h2 class="text-primary text-center">Reports</h2>
+    <div>
+        <table class="table" id="myTable">
+            <thead>
+                <tr>
+                    <th>Article Name</th>
+                    <th>Report Category</th>
+                    <th>Reporter Name</th>
+                    <th>Report Time</th>
+                    <th>Go To Article Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var report in Model)
+                {
+                    <tr>
+                        <td>@report.Article.Title</td>
+                        <td>@report.ReportCategory.Name</td>
+                        <td>@report.ApplicationUser.NickName</td>
+                        <td>
+                            @if (report.ReportTime != null)
+                            {
+                                @report.ReportTime.Value.ToString("g");
+                            }
+
+                        </td>
+                        <td class="tm-product-name">
+                            @if (report.IsInvestigated == true)
+                            {
+                                <a href="@Url.Action("ArticleDetails","AdminArticle", new {id = report.ArticleId,isInvestigated = true,reportId = report.Id})" class="ml-5" style="color:green"><i class="fas fa-arrow-right"></i></a>
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("ArticleDetails","AdminArticle", new {id = report.ArticleId,isInvestigated = true,reportId = report.Id})" class="ml-5" style="color:red"><i class="fas fa-arrow-right"></i></a>
+                            }
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable();
+        });
+        $('#myTable').DataTable({ "order": [[3, "desc"]] });
+    </script>
+}

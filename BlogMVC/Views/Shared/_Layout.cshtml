@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+
+    <!--- basic page needs
+    ================================================== -->
+    <meta charset="utf-8">
+    <title>Philosophy</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- mobile specific metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- CSS
+    ================================================== -->
+    <link rel="stylesheet" href="~/css/base.css">
+    <link rel="stylesheet" href="~/css/vendor.css">
+    <link rel="stylesheet" href="~/css/main.css">
+    <link href="~/Content/fontawesome-all.min.css" rel="stylesheet" />
+    <link href="~/Content/toastr.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/medium-editor@latest/dist/css/medium-editor.min.css" type="text/css" media="screen" charset="utf-8">
+    <link href="~/css/PagedList.css" rel="stylesheet" />
+
+    @RenderSection("styles", false)
+    <!-- script
+    ================================================== -->
+    <script src="~/js/modernizr.js"></script>
+    <script src="~/js/pace.min.js"></script>
+
+    <!-- favicons
+    ================================================== -->
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- end s-pageheader -->
+
+</head>
+<body id="top">
+    <section class="s-pageheader s-pageheader--home">
+
+        <header class="header">
+            <div class="header__content row">
+
+                <div class="header__logo">
+                    <a class="logo" href="@Url.Action("Index","Home")">
+                        <img src="~/images/logo.svg" alt="Homepage">
+                    </a>
+                </div> <!-- end header__logo -->
+
+                <ul class="header__social">
+                    <li>
+                        <a href="https://twitter.com/FakiTayran"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+                    </li>
+                    <li>
+                        <a href="https://www.instagram.com/fakitayran/?hl=tr"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/FakiTayran"><i class="fab fa-github" aria-hidden="true"></i></a>
+                    </li>
+                    <li>
+                        <a href="https://stackoverflow.com/users/14360760/fakitayran"><i class="fab fa-stack-overflow" aria-hidden="true"></i></a>
+                    </li>
+                </ul> <!-- end header__social -->
+
+                <a class="header__search-trigger" href="#0"></a>
+
+                <div class="header__search">
+
+                    <form role="search" method="get" class="header__search-form" action="#">
+                        <label>
+                            <span class="hide-content">Search for:</span>
+                            <input id ="searchId" type="search" class="search-field" placeholder="Type Keywords" value="" name="s" title="Search for:" autocomplete="off">
+                        </label>
+                        <input id ="submitId" type="submit" class="search-submit" value="Search">
+                    </form>
+
+                    <a href="#0" title="Close Search" class="header__overlay-close">Close</a>
+
+                </div>  <!-- end header__search -->
+
+
+                <a class="header__toggle-menu" href="#0" title="Menu"><span>Menu</span></a>
+
+                <nav class="header__nav-wrap">
+
+                    <h2 class="header__nav-heading h6">Site Navigation</h2>
+
+                    <ul class="header__nav">
+                        <li id="HomeA"><a href="@Url.Action("Index","Home")" title="">Home</a></li>
+                        <li class="has-children" id="CategoriesA">
+                            <a href="#" title="">Categories</a>
+                            <ul class="sub-menu">
+                                @Html.Action("CategoryNavPartial", "Category")
+                            </ul>
+                        </li>
+                        <li id="AboutA"><a href="@Url.Action("About","Home")" title="">About</a></li>
+                        <li id="ContactA"><a href="@Url.Action("Contact","Home")" title="">Contact</a></li>
+                        @if (User.IsInRole("admin"))
+                        {
+                            <li id="AdminPanelA">@Html.ActionLink("Admin Panel", "Index", "Dashboard", new { area = "Admin" }, null)</li>
+                        }
+                        <li id="MyArticlesA"><a href="@Url.Action("Index","Profile")">My Articles</a></li>
+                        @Html.Partial("_LoginPartial")
+
+                    </ul> <!-- end header__nav -->
+
+                    <a href="#0" title="Close Menu" class="header__overlay-close close-mobile-menu">Close</a>
+
+                </nav> <!-- end header__nav-wrap -->
+            </div> <!-- header-content -->
+        </header> <!-- header -->
+        <!-- end pageheader-content row -->
+        @RenderSection("welcome", required: false)
+    </section>
+    @RenderBody()
+
+    @RenderSection("extraS", false)
+
+    <footer class="s-footer">
+
+        <div class="s-footer__main">
+            <div class="row">
+
+                <div class="col-two md-four mob-full s-footer__sitelinks">
+
+                    <h4>Quick Links</h4>
+
+                    <ul class="s-footer__linklist">
+                        <li><a href="@Url.Action("Index","Home")">Home</a></li>
+                        <li><a href="@Url.Action("About","Home")">About</a></li>
+                        <li><a href="@Url.Action("Contact","Home")">Contact</a></li>
+                        <li><a href="@Url.Action("Index","Profile")">My Articles</a></li>
+                    </ul>
+
+                </div> <!-- end s-footer__sitelinks -->
+
+               
+
+                <div class="col-two md-four mob-full s-footer__social">
+
+                    <h4>Social</h4>
+
+                    <ul class="s-footer__linklist">
+                        <li><a href="https://twitter.com/FakiTayran">Twitter</a></li>
+                        <li><a href="https://www.instagram.com/fakitayran/?hl=tr">Instagram</a></li>
+                        <li><a href="https://github.com/FakiTayran">Github</a></li>
+                        <li><a href="https://stackoverflow.com/users/14360760/fakitayran">StackOverflow</a></li>
+                    </ul>
+
+                </div> <!-- end s-footer__social -->
+
+                <div class="col-five md-full end s-footer__subscribe">
+
+                    <h4>Our Newsletter</h4>
+
+                    <p>Sit vel delectus amet officiis repudiandae est voluptatem. Tempora maxime provident nisi et fuga et enim exercitationem ipsam. Culpa consequatur occaecati.</p>
+
+                    <div class="subscribe-form">
+                        <form id="mc-form" class="group" novalidate="true">
+
+                            <input type="email" value="" name="EMAIL" class="email" id="mc-email" placeholder="Email Address" required="">
+
+                            <input type="submit" name="subscribe" value="Send">
+
+                            <label for="mc-email" class="subscribe-message"></label>
+
+                        </form>
+                    </div>
+
+                </div> <!-- end s-footer__subscribe -->
+
+            </div>
+        </div> <!-- end s-footer__main -->
+
+        <div class="s-footer__bottom">
+            <div class="row">
+                <div class="col-full">
+                    <div class="s-footer__copyright">
+                        <span>© Faki Tayran Arıduru 2021</span>
+                        <span>Site Template by <a href="https://colorlib.com/">Colorlib</a></span>
+                    </div>
+
+                    <div class="go-top">
+                        <a class="smoothscroll" title="Back to Top" href="#top"></a>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end s-footer__bottom -->
+
+    </footer> <!-- end s-footer -->
+    <!-- preloader
+    ================================================== -->
+    <div id="preloader">
+        <div id="loader">
+            <div class="line-scale">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Java Script
+    ================================================== -->
+    <script src="~/js/jquery-3.2.1.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/toastr.min.js"></script>
+    <script src="~/js/plugins.js"></script>
+    <script src="~/js/main.js"></script>
+    <script>
+        var activeLink = "@ViewBag.Active";
+        if (activeLink) {
+            switch (activeLink) {
+                case "Home":
+                    $("#HomeA").addClass("current");
+                    break;
+                case "Category":
+                    $("#CategoriesA").addClass("current");
+                    break;
+                case "MyArticles":
+                    $("#MyArticlesA").addClass("current");
+                    break;
+                case "About":
+                    $("#AboutA").addClass("current");
+                    break;
+                case "Contact":
+                    $("#ContactA").addClass("current");
+                    break;
+                case "Manage":
+                    $("#ManageA").addClass("current");
+                    break;
+            }
+        }
+    </script>
+    <script>
+        $("#submitId").on("click", function (e) {
+            e.preventDefault();
+            var input = $("#searchId").val().toUpperCase();
+            $(".masonry__brick").each(function () {
+                if ($(this).data("string").toUpperCase().indexOf(input) < 0) {
+                    $(this).hide();
+                } else {
+                    $(this).show();
+                }
+            })
+        });
+    </script>
+    @RenderSection("scripts", false)
+
+</body>
+
+</html>

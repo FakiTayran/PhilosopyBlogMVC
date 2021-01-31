@@ -1,0 +1,74 @@
+﻿@using BlogMVC.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Log in";
+}
+@section styles{
+    <style>
+        .container {
+            border-radius: 5px;
+            margin: auto;
+            background-color: white;
+        }
+        .chkbox {
+            display: flex;
+            align-items: baseline;
+        }
+        .loginh4 {
+            padding-top: 50px;
+            margin-top: 0px
+        }
+    </style>
+}
+<div class="container" ;>
+
+    <section class="row narrow section-intro add-bottom text-center" id="">
+        @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <h4 class="loginh4">Use a local account to log in.</h4>
+            <hr />
+            @Html.ValidationSummary(true)
+            <div>
+                @Html.LabelFor(m => m.Email)
+                <div>
+                    @Html.TextBoxFor(m => m.Email, new { @class = "full-width" })
+                    @Html.ValidationMessageFor(m => m.Email)
+                </div>
+            </div>
+            <div>
+                @Html.LabelFor(m => m.Password)
+                <div>
+                    @Html.PasswordFor(m => m.Password, new { @class = "full-width" })
+                    @Html.ValidationMessageFor(m => m.Password)
+                </div>
+            </div>
+            <div>
+                <div>
+                    <div class="chkbox">
+                        @Html.CheckBoxFor(m => m.RememberMe, new { style = "margin-right:5px" })
+                        @Html.LabelFor(m => m.RememberMe)
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div>
+                    <input type="submit" value="Log in" class="btn--primary" />
+                </div>
+            </div>
+            <p>
+                @Html.ActionLink("Register as a new user", "Register")
+            </p>
+            @* Enable this once you have account confirmation enabled for password reset functionality
+                <p>
+                    @Html.ActionLink("Forgot your password?", "ForgotPassword")
+                </p>*@
+        }
+    </section>
+
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

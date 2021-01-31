@@ -1,0 +1,89 @@
+﻿@using BlogMVC.Models
+@model List<Article>
+@{
+    ViewBag.Title = "Index";
+}
+@section styles{
+    <style>
+        .tm-edit-icon {
+            color: #6e6c6c;
+            cursor: pointer;
+        }
+
+            .tm-edit-icon:hover {
+                color: goldenrod;
+            }
+
+        .tm-trash-icon {
+            color: #6e6c6c;
+            cursor: pointer;
+        }
+
+            .tm-trash-icon:hover {
+                color: #9f1321;
+            }
+
+        #goToArticle {
+            font-size: 30px;
+            transition: .5s;
+        }
+
+            #goToArticle:hover {
+                font-size: 32px;
+                color: green;
+                transition: .5s;
+            }
+    </style>
+
+}
+<section class="s-content">
+    <div class="row text-center">
+        @Html.ActionLink("New Article", "NewArticle", "Profile", new { @class = "btn btn--primary" })
+    </div>
+    @if (Model.Count == 0)
+    {
+        <div class="row text-center">
+            <hr />
+            <p>
+                You don't have an article yet. Would you like to create a new one right now?
+            </p>
+        </div>
+    }
+    @foreach (var item in Model)
+    {
+        <div class="row " style=" word-break: break-all; ">
+            <div class="col-md-12 full-width">
+                <h4>@item.Title</h4>
+                <div class="entry__excerpt">
+                    @item.Summary
+                </div>
+                <p>@item.ArticleTime.Value.ToString("dddd, MMMM d, yyyy")</p>
+                <a href="@Url.Action("Index","Article",new {id=item.Id})"><i class="fas fa-directions" id="goToArticle">Go To Article</i> </a>
+                <div class="text-right">
+                    <a href="@Url.Action("Delete","Profile",new {id = item.Id})" id="btnDelete"><i class="fas fa-trash-alt tm-trash-icon" style="font-size:x-large;"></i></a>
+                    <a href="@Url.Action("Edit","Profile",new {id = item.Id })"><i class="fas fa-edit tm-edit-icon" style="font-size:x-large"></i></a>
+                </div>
+            </div>
+        </div>
+        <hr />
+    }
+
+</section>
+
+@section scripts{
+    <script>
+        $("#btnDelete").click(function () {
+
+            if (!confirm("Your article will be delete after this process ?")) {
+                return false;
+            };
+        });
+
+        var deleteArticleProcess = "@TempData["DeleteArticle"]";
+        if (deleteArticleProcess) {
+            toastr.success("Your Article has been successfuly removed")
+        }
+
+
+    </script>
+}

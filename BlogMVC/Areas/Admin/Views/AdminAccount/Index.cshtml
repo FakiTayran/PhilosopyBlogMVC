@@ -1,0 +1,165 @@
+﻿@model List<UserViewModel>
+@{
+    ViewBag.Title = "Index";
+}
+<br />
+
+@if (!string.IsNullOrEmpty(ViewBag.result))
+{
+    <div class="alert alert-info" id="alert">
+        @switch (ViewBag.result)
+        {
+            case "rolAdded":
+                <p>
+                    The administrator authority you selected has been granted.
+                </p>
+                break;
+            case "rolRemoved":
+                <p>
+                    Admin authority removed from the user you selected
+                </p>
+                break;
+            case "errorRolChanging":
+                <p>
+                    An error occurred during role assignment.
+                </p>
+                break;
+            case "userDeleted":
+                <p>
+                    User Has been deleted.
+                </p>
+                break;
+            case "userNotFind":
+                <p>
+                    User Not Find In Database.
+                </p>
+                break;
+            case "adminDeleteError":
+                <p>
+                    Admin does not delete.
+                </p>
+                break;
+            case "OneAdmin":
+                <p>
+                    Must have at least 1 admin
+                </p>
+                break;
+        }
+    </div>
+}
+<div class="container bg-white " style="overflow:scroll">
+    <h2 class="text-primary text-center mt-5">User Controller</h2>
+    <div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Roles</th>
+                    <th>Authority</th>
+                    <th>Delete</th>
+                    <th>Update Password</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.UserName</td>
+                        <td>@user.Email</td>
+                        <td>@string.Join(" ,", user.Roles)</td>
+                        <td>
+                            @using (Html.BeginForm("GiveAdminRole", "AdminAccount", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("userId", user.Id)
+
+                                <div class="d-flex">
+                                    <label for="IsAdmin-@user.Id">Admin</label>
+                                    <div class="ml-1">
+                                        @Html.CheckBox("IsAdmin", user.Roles.Contains("admin"), new { id = "IsAdmin-" + user.Id })
+                                    </div>
+                                </div>
+                            }
+                        </td>
+                        <td><a href="@Url.Action("DeleteUser","AdminAccount",new {id=user.Id})" id="btnDelete"><i class="fas fa-trash-alt tm-trash-icon btn btn-danger"></i></a></td>
+                        <td>
+                            <button class="btn btn-warning" data-toggle="modal" data-target="#myModal" data-user-id="@user.Id"
+                                    data-user-name="@user.UserName">
+                                Edit Password
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<form action="" method="post" id="frmPasswordUpdate">
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Password Update(<span id="UserName"></span>)</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("UserId")
+                    @Html.Label("New Password")
+                    @Html.Password("password", null, new { @class = "form-control", required = "required", minlenght = 6 })
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section scripts{
+    <script>
+        $("input:checkbox[name='IsAdmin']").change(function () {
+            $(this).closest("form").submit();
+        });
+
+        $("#btnDelete").click(function () {
+            if (!confirm("Your user will be delete after this process ?")) {
+                return false;
+            };
+        });
+
+        setTimeout(function () {
+            $("#alert").hide(500);
+        }, 2000);
+
+        $("#myModal").on("show.bs.modal", function (event) {
+            var button = $(event.relatedTarget);
+            var userId = button.data("user-id");
+            var userName = button.data('user-name');
+            var modal = $(this);
+            modal.find("#UserId").val(userId);
+            modal.find('#UserName').text(userName);
+        });
+
+        $("#frmPasswordUpdate").submit(function (e) {
+            e.preventDefault();
+            var frm = this;
+            $.ajax({
+                type: "post",
+                url: "@Url.Action("PasswordChange","AdminAccount")",
+                data: $(frm).serialize(),
+                success: function (data) {
+                    frm.reset();
+                    $("#myModal").modal("hide");
+                    alert("Password changed success")
+                },
+                error: function (xhr, status, error) {
+                    return (xhr.responseJSON.error);
+                }
+            });
+        });
+
+    </script>
+}

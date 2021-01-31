@@ -1,0 +1,284 @@
+﻿@using BlogMVC.Models
+@model Article
+@{
+    ViewBag.Title = "Index";
+}
+
+
+<!-- s-content
+   ================================================== -->
+<section class="s-content s-content--narrow s-content--no-padding-bottom">
+
+    <article class="row format-standard">
+
+        <div class="s-content__header col-full">
+            <h1 class="s-content__header-title">
+                @Model.Title
+            </h1>
+            <ul class="s-content__header-meta">
+                <li class="date">@Model.ArticleTime.Value.ToString("dddd, MMMM d, yyyy")</li>
+                <li class="cat">
+                    In
+                    @foreach (var item in Model.Categories)
+                    {
+                        <a href="#0">@item.Name</a>
+                    }
+                </li>
+            </ul>
+        </div> <!-- end s-content__header -->
+        @if (!String.IsNullOrEmpty(Model.PhotoPath))
+        {
+            <div class="s-content__media col-full" style="justify-content:center; display:flex;">
+                <div class="s-content__post-thumb">
+                    <img src="@Model.PhotoPath" alt="@Model.Title" />
+                </div>
+            </div> <!-- end s-content__media -->
+        }
+
+        <div class="col-full s-content__main ">
+            <p class="drop-cap">
+                @Html.Raw(Model.Content)
+            </p>
+
+            @if (User.Identity.IsAuthenticated)
+            {
+
+                <div class="full-width position-absolute d-flex">
+                    @if (Model.Likes.Any(x => x.ApplicationUser.UserName == HttpContext.Current.User.Identity.Name))
+                    {
+                        <a href="#" id="likeButton" data-article-like-id="@Model.Id" style="color:black"><i class="fas fa-thumbs-up" style="font-size:x-large; margin-right:10px;"></i></a>
+                    }
+                    else
+                    {
+                        <a href="#" id="likeButton" data-article-like-id="@Model.Id"><i class="fas fa-thumbs-up" style="font-size:x-large; margin-right:10px;"></i></a>
+                    }
+                    <span class="ml-1" id="LikeCount">@Model.Likes.Count()</span>
+                </div>
+                <a href="#ex1" rel="modal:open"><i class="fas fa-flag" style="font-size:x-large"></i></a>
+
+                <div id="ex1" class="modal">
+                    <form id="frmSendReport" method="post">
+                        <p><strong>Report Reason</strong></p>
+                        @Html.Hidden("articleId", Model.Id)
+                        @Html.DropDownList("reportType", (SelectList)ViewBag.reportTypes, new { @class = "full-width" })
+                        <div class="text-center">
+                            <a href="#" rel="modal:close" onclick="$('#frmSendReport').submit()" class="btn btn--pill">Send</a>
+                        </div>
+                    </form>
+                </div>
+
+            }
+            <p class="s-content__tags ">
+                <span>Post Categories</span>
+
+                <span class="s-content__tag-list">
+                    @foreach (var item in Model.Categories)
+                    {
+                        <a href="#0">@item.Name</a>
+                    }
+
+                </span>
+            </p> <!-- end s-content__tags -->
+
+            <div class="s-content__author ">
+                <br />
+                <img src="~/images/avatars/user-03.jpg" alt="">
+                <div class="s-content__author-about">
+                    <h4 class="s-content__author-name">
+                        <a href="#0">@Model.ApplicationUser.NickName</a>
+                    </h4>
+                </div>
+            </div>
+        </div> <!-- end s-content__main -->
+
+    </article>
+
+    <!-- comments
+    ================================================== -->
+    <div class="comments-wrap">
+
+        <div id="comments" class="row">
+            <div class="col-full">
+
+                <h2 class="h2">
+                    <span id="commentCount">@Model.Comments.Count </span> Comments
+                </h2>
+
+                <!-- commentlist -->
+                <ol class="commentlist">
+                    @if (!Model.Comments.Any())
+                    {
+                        <p class="text-center noComment">There is no comment yet.Add first comment.</p>
+                    }
+                    else
+                    {
+                        foreach (Comment comment in Model.Comments.OrderByDescending(x => x.CommentTime))
+                        {
+                            <li class="depth-1 comment" id="commentli">
+                                <div class="comment__avatar">
+                                    <img width="50" height="50" class="avatar" src="https://picsum.photos/50/50" alt="">
+                                </div>
+                                <div class="comment__content" id="comment__content">
+
+                                    <div class="comment__info">
+                                        <cite id="commentUserName">@comment.ApplicationUser.NickName</cite>
+
+                                        <div class="comment__meta">
+                                            <time class="comment__time" id="commentTime">@comment.CommentTime.ToString("dddd, MMMM d, yyyy")</time>
+                                        </div>
+                                    </div>
+
+                                    <div class="comment__text">
+                                        <p id="contentArea">
+                                            @comment.Content
+                                        </p>
+                                    </div>
+
+                                </div>
+                            </li>
+                            <hr />
+                        }
+                    }
+                </ol> <!-- end commentlist -->
+                <!-- respond
+                ================================================== -->
+                <div class="respond">
+
+                    <h3 class="h2">Add Comment</h3>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        @Html.Partial("_CommentPartial", new AddCommentViewModel { ArticleId = Model.Id })
+                    }
+                    else
+                    {
+                        <p class="text-center my-0">
+                            For Add New Comment You Have To <a href="@Url.Action("Login", "Account",
+                                          new { returnUrl = this.Request.RawUrl })"><span style="font:bold">Login</span></a> First
+                        </p>
+                    }
+
+                </div> <!-- end respond -->
+
+            </div> <!-- end col-full -->
+
+        </div> <!-- end row comments -->
+    </div> <!-- end comments-wrap -->
+
+</section> <!-- s-content -->
+<!-- s-extra
+================================================== -->
+<section class="s-extra">
+
+    <div class="row top">
+
+        <div class="col-eight md-six tab-full popular">
+            <h3>Popular Posts</h3>
+            @Html.Action("PopularPostPartial", "Home")
+        </div> <!-- end popular -->
+
+        <div class="col-four md-six tab-full about">
+            <h3>About Philosophy</h3>
+
+            <p>
+                Donec sollicitudin molestie malesuada. Nulla quis lorem ut libero malesuada feugiat. Pellentesque in ipsum id orci porta dapibus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Donec sollicitudin molestie malesuada.
+            </p>
+
+        </div> <!-- end about -->
+
+    </div> <!-- end row -->
+</section> <!-- end s-extra -->
+
+@section scripts {
+    <!-- Modal -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $("#contactForm").submit(function (e) {
+            e.preventDefault();
+
+                $.ajax({
+                    type: "post",
+                    url: "@Url.Action("AddComment","Article")",
+                    data: $("#contactForm").serialize(),
+                    success: function (receivedData) {
+                        toastr.success(receivedData.CommentSuccess);
+                        $(".noComment").hide();
+                        $("#cMessage").val("");
+
+                        var count = parseInt($("#commentCount").text());
+                        $("#commentCount").text(count + 1);
+                        var p = $("<p/>").text(receivedData.Content);
+                        var cite = $("<cite/>").text(receivedData.Author);
+                        var time = $("<time/>").text(receivedData.CommentTime);
+                        var div0 = $("<div/>").addClass("comment__content")
+                        var div1 = $("<div/>").addClass("comment__info").append(cite);
+                        var div2 = $("<div/>").addClass("comment__meta").append(time);
+                        var div3 = $("<div/>").addClass("comment__text").append(p);
+                        var div4 = div1.append(div2);
+                        var div5 = div0.append(div4).append(div3);
+                        var img = $("<img/>").addClass("avatar").attr({ height: "50", width: "50", src: "https://picsum.photos/50/50" });
+                        var divimg = $("<div/>").addClass("comment__avatar").append(img);
+                        var li = $("<li/>").addClass("depth-1 comment").attr("id", "commentli").prepend("<hr/>").prepend(div5).prepend(divimg);
+                        $(".commentlist").prepend(li);
+
+                        //$("#cMessage").val("");
+                        //var p = $("<p/>").text(receivedData.Content);
+                        //var detay = $("<small/>")
+                        //    .addClass("text-muted")
+                        //    .text(receivedData.CommentTime + " tarihinde " +
+                        //        receivedData.Author + " tarafından yazıldı");
+
+                        //$("#yorumEkle").prepend("<hr />").prepend(detay).prepend(p);
+                    }
+                });
+        });
+    </script>
+    <script>
+        $("#frmSendReport").submit(function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                type: "post",
+                url: "@Url.Action("SendReport","Article")",
+                data: $("#frmSendReport").serialize(),
+                success: function (data) {
+                    toastr.success("Report successfuly send")
+                },
+                error: function () {
+                    toastr.er("Report is not send to admins.")
+                }
+            });
+        });
+        $("body").on("click","[data-article-like-id]", function (e) {
+            e.preventDefault();
+            var likedArticleId = $(this).data("article-like-id")
+
+            var likeCount = parseInt($("#LikeCount").text())
+            $.ajax({
+                type: "post",
+                url: "@Url.Action("Like","Article")",
+                data: { LikedArticleId : likedArticleId },
+                success: function (data) {
+                    switch (data) {
+                        case "Unlike":
+                            $("#likeButton").css("color", "#0058A5");
+                            $("#LikeCount").text(likeCount - 1)
+
+                            break;
+                        case "Like":
+                            $("#likeButton").css("color", "black");
+                            $("#LikeCount").text(likeCount + 1)
+                            break;
+                    }
+
+                },
+                error: function () {
+                    toastr.error("Error occured while liking")
+                }
+            });
+        });
+    </script>
+}

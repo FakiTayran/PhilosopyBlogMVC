@@ -1,0 +1,137 @@
+﻿@using BlogMVC.Models
+@model Article
+@{
+    ViewBag.Title = "NewArticle";
+    Model.Content = HttpUtility.HtmlDecode(Model.Content);
+}
+
+
+@section styles{
+
+    <style>
+        .sa {
+            display: flex;
+            justify-content: center;
+        }
+
+        .opt {
+            width: 20em;
+            height: 20em;
+        }
+
+        .container {
+            margin: auto;
+            background-color: white;
+        }
+
+        .chkbox {
+            display: flex;
+            align-items: baseline;
+        }
+
+        .loginh4 {
+            padding-top: 40px;
+            margin-top: 0px
+        }
+    </style>
+}
+
+<div class="container">
+    <section class="row narrow section-intro add-bottom text-center" id="">
+        <h3 class="loginh4">Edit Article</h3>
+        <hr />
+        @using (Html.BeginForm("Edit", "Profile", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmNewArticle" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(x => x.Id)
+
+            @Html.LabelFor(x => x.Title, new { @class = "loginh4" })
+            @Html.TextBoxFor(x => x.Title, new { @class = "full-width", required = "required" })
+            @Html.ValidationMessageFor(x => x.Title)
+
+            @Html.LabelFor(x => x.Summary)
+            <div>
+                @Html.TextAreaFor(x => x.Summary, new { @class = "full-width", placeholder = "Create an impressive summary for your article.", maxlength = 300, required = "required" })
+            </div>
+            @Html.ValidationMessageFor(x => x.Summary)
+
+            @Html.Label("Categories")
+            <div class="sa">
+                @Html.ListBox("cats", (MultiSelectList)ViewBag.cats, new { @class = "opt", required = "required", id = "listbox" })
+            </div>
+
+
+            @Html.LabelFor(x => x.Content)
+            @Html.TextAreaFor(x => x.Content, new { @class = "full-width", id = "summernote", required = "required" })
+            @Html.ValidationMessageFor(x => x.Content)
+
+            @Html.Label("Image")
+            @Html.TextBox("file", null, new { type = "file" })
+
+            <input class="btn--primary full-width" type="submit" value="Save" id="submit" onclick="myFunction()">
+        }
+
+    </section>
+
+</div>
+
+@section scripts{
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+
+    <script>
+        $('#summernote').summernote({
+            placeholder: 'Hello stand alone ui',
+            tabsize: 2,
+            height: 520,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ]
+        });
+        $('#summernote').summernote({ dialogsInBody: true });
+
+    </script>
+
+    <script>
+        $('option').mousedown(function (e) {
+            e.preventDefault();
+            $(this).prop('selected', !$(this).prop('selected'));
+            return false;
+        });
+    </script>
+
+    <script>
+        var btn = document.getElementById("submit")
+        function myFunction() {
+            var listBox = document.getElementById("listbox");
+            var listBoxCnt = 0;
+            for (var i = 0; i < listBox.options.length; i++) {
+                if (listBox.options[i].selected) {
+                    listBoxCnt++;
+                }
+            }
+            if (listBoxCnt == 0) {
+                toastr.error("You must choose category !");
+            }
+            if ($("#summernote").val().length < 500) {
+                toastr.error("You must enter content of at least 500 characters");
+                $("#frmNewArticle").submit(function (e) {
+                    e.preventDefault();
+                });
+            }
+        };
+
+        var editArticleProcess = "@TempData["EditArticle"]";
+        if (editArticleProcess) {
+            toastr.error("There was a problem while editing, please make your checks above.")
+        }
+    </script>
+
+}

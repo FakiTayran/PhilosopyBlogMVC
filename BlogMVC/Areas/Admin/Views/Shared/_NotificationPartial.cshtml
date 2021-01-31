@@ -1,0 +1,13 @@
+﻿@model List<Report>
+
+<li class="nav-item">
+    @if (@Model.Where(x => x.IsInvestigated == false).Count() == 0)
+    {
+        <a class="nav-link" id="reportsA" href="@Url.Action("Index","AdminReport")">Reports <span class="badge badge-success">@Model.Where(x => x.IsInvestigated == false).Count()</span></a>
+
+    }
+    else
+    {
+        <a class="nav-link" id="reportsA" href="@Url.Action("Index","AdminReport")">Reports <span class="badge badge-danger">@Model.Where(x => x.IsInvestigated == false).Count()</span></a>
+    }
+</li>

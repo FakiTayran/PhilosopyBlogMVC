@@ -1,0 +1,104 @@
+﻿@using PagedList.Mvc;
+@model PagedList.IPagedList<BlogMVC.Models.Article>
+@{
+    ViewBag.Title = "Index";
+}
+
+<!-- s-content
+    ================================================== -->
+<section class="s-content">
+
+    <div class="row narrow">
+        <div class="col-full s-content__header" data-aos="fade-up">
+            <h1>@ViewBag.categoryName</h1>
+
+            <p class="lead">@ViewBag.categoryDescription</p>
+        </div>
+    </div>
+
+    <div class="row masonry-wrap">
+        <div class="masonry">
+
+            <div class="grid-sizer"></div>
+
+            @foreach (var article in Model)
+            {
+                <article class="masonry__brick entry format-standard" data-aos="fade-up" data-string="@article.Title">
+
+                    <div class="entry__thumb">
+                        <a href="@Url.Action("Index", "Article", new { id = article.Id })" class="entry__thumb-link">
+                            @if (!string.IsNullOrEmpty(article.PhotoPath))
+                            {
+                                <img class="img-fluid w-50" src="@article.PhotoPath" alt="@article.Title">
+                            }
+                        </a>
+                    </div>
+
+                    <div class="entry__text">
+                        <div class="entry__header">
+
+                            <div class="entry__date">
+                                <a href="single-standard.html">@article.ArticleTime.Value.ToString("dddd, MMMM d, yyyy")</a>
+                            </div>
+                            <h1 class="entry__title">
+                                <a href="@Url.Action("Index", "Article", new { id = article.Id })">@article.Title</a>
+                            </h1>
+
+                        </div>
+                        <div class="entry__excerpt" style="max-height:300px; overflow:hidden">
+                            <p>
+                                @Html.Raw(article.Summary)
+                            </p>
+                        </div>
+                        <div class="entry__meta">
+                            <span class="entry__meta-links">
+                                @foreach (var item in article.Categories)
+                                {
+                                    @Html.ActionLink(item.Name, "Index", "Category", new { name = item.Name }, null)
+                                }
+                            </span>
+                        </div>
+                    </div>
+
+                </article> <!-- end article -->
+            }
+
+        </div> <!-- end masonry -->
+    </div> <!-- end masonry-wrap -->
+
+    <div class="row">
+        <div class="col-full">
+            <nav class="pgn">
+                Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+                @Html.PagedListPager(Model, page => Url.Action("Index", "Category", new { page }))
+            </nav>
+        </div>
+    </div>
+
+</section> <!-- s-content -->
+
+@section extraS{
+
+    <!-- s-extra
+    ================================================== -->
+    <section class="s-extra">
+
+        <div class="row top">
+
+            <div class="col-eight md-six tab-full popular">
+                <h3>Popular Posts</h3>
+                @Html.Action("PopularPostPartial", "Home")
+            </div> <!-- end popular -->
+
+            <div class="col-four md-six tab-full about">
+                <h3>About Philosophy</h3>
+
+                <p>
+                    Donec sollicitudin molestie malesuada. Nulla quis lorem ut libero malesuada feugiat. Pellentesque in ipsum id orci porta dapibus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit amet ligula. Quisque velit nisi, pretium ut lacinia in, elementum id enim. Donec sollicitudin molestie malesuada.
+                </p>
+
+            </div> <!-- end about -->
+
+        </div> <!-- end row -->
+    </section><!-- end s-extra -->
+}

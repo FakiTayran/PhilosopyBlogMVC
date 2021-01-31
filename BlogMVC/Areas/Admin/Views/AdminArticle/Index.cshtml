@@ -1,0 +1,206 @@
+﻿@model List<Article>
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="row tm-content-row tm-mt-big">
+    <div class="col-xl-8 col-lg-12 tm-md-12 tm-sm-12 tm-col">
+        <div class="bg-white tm-block h-100">
+            <div class="row">
+                <div class="col-md-8 col-sm-12">
+                    <h2 class="tm-block-title d-inline-block">Articles</h2>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-striped tm-table-striped-even mt-3" id="myTable">
+                    <thead>
+                        <tr class="tm-bg-gray">
+                            <th scope="col">Name</th>
+                            <th scope="col">Author</th>
+                            <th scope="col" class="text-center">#Comment</th>
+                            <th scope="col">Time</th>
+                            <th scope="col" class="text-center">Categories</th>
+                            <th scope="col">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var article in Model)
+                        {
+                            <tr >
+                                <td class="tm-product-name"><a href="@Url.Action("ArticleDetails","AdminArticle", new {id = article.Id })"><i class="fas fa-arrow-right"></i> <span class="tm-link-black">@article.Title</span></a></td>
+                                <td class="text-left">@article.ApplicationUser.NickName</td>
+                                <td class="text-center">@article.Comments.Count()</td>
+                                <td>@article.ArticleTime.Value.ToString("dddd, MMMM d, yyyy")</td>
+                                <td class="text-center">@string.Join(" ", article.Categories.Select(x => x.Name))</td>
+                                <td>
+                                    <a href="@Url.Action("DeleteArticle","AdminArticle",new { id=article.Id})" id="btnDeleteArticle" class="btnDeleteArticle">
+                                        <i class="fas fa-trash-alt tm-trash-icon"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-12 tm-md-12 tm-sm-12 tm-col">
+        <div class="bg-white tm-block h-100">
+            <h2 class="tm-block-title d-inline-block">Article Categories</h2>
+            <table class="table table-hover table-striped mt-3">
+                <tbody>
+                    @foreach (var category in ViewBag.adminCategories)
+                    {
+                        <tr>
+                            <td>@category.Name</td>
+                            <td class="tm-trash-icon-cell "><a href="@Url.Action("DeleteCategory","AdminArticle",new {id= category.Id})" class="btnCategoryDelete"><i class="fas fa-trash-alt tm-trash-icon"></i></a></td>
+                            <td class="tm-trash-icon-cell pl-0">
+                                <a href="#" id="cat-@category.Id" class="btnEditCategory" data-toggle="modal" data-target="#myEditModal"><i class="fas fa-edit tm-edit-icon"></i></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <a href="#" class="btn btn-primary tm-table-mt" data-toggle="modal" data-target="#myModal">Add New Category </a>
+        </div>
+    </div>
+</div>
+
+<form action="@Url.Action("AddCategory","AdminArticle")" method="post" id="frmAddCategory">
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Add New Category</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    @Html.Label("Category Name")
+                    @Html.TextBox("categoryName", null, new { @class = "form-control", required = "required", maxlength = 30 })
+                    @Html.Label("Description")
+                    @Html.TextArea("description", null, new { @class = "form-control", required = "required", maxlength = 300 })
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<form id="frmEditCategory" action="@Url.Action("EditCategory","AdminArticle")" method="post">
+    <div class="modal fade" id="myEditModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Edit Category</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    @Html.Hidden("catId", "")
+                    @Html.Label("Category Name")
+                    @Html.TextBox("editCategoryName", null, new { @class = "form-control", required = "required", maxlength = 30, minlength = 3 })
+                    @Html.Label("Category Description")
+                    @Html.TextArea("editDescription", null, new { @class = "form-control", required = "required", maxlength = 300, minlength = 5 })
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section scripts{
+    <script>
+        $(".btnCategoryDelete").click(function () {
+
+            if (!confirm("Selected article will be deleted after this.")) {
+                return false;
+            };
+        });
+        var articleDeleteProcess = "@TempData["ArticleDelete"]";
+        if (articleDeleteProcess) {
+            toastr.success("Selected Article has been removed successfully.")
+        }
+
+        $(".btnDeleteArticle").click(function () {
+
+            if (!confirm("Selected article will be deleted after this.")) {
+                return false;
+            };
+
+        });
+
+        var view = "@ViewBag.categorySuccess"
+        var viewEdit = "@ViewBag.categoryEditStatus"
+
+        if (view) {
+            switch (view) {
+                case "Category Successfuly Added":
+                    toastr.success("Category Successfuly Added")
+                    break;
+                case "Category is not Added":
+                    toastr.error("Category is not Added")
+                    break;
+            }
+        }
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable();
+        });
+    </script>
+
+    <script>
+        var status = "@TempData["status"]";
+        if (status)
+        {
+            switch (status) {
+
+                case "error":
+                    toastr.error("An error occurred while processing your request!");
+                    break;
+                case "success":
+                    toastr.success("Your requsted has been completed successfully.");
+                    break;
+            }
+        }
+
+        var selectedCatId = "";
+        $(".btnEditCategory").click(function () {
+
+            selectedCatId = $(this).attr('id');
+
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("EditCategory", "AdminArticle")",
+                data: { id: selectedCatId},
+                success: function (data) {
+
+                    $('input[name=catId]').val(data.Id);
+                    $("#editCategoryName").val(data.Name);
+                    $("#editDescription").val(data.Description);
+                },
+                error: function () {
+                    alert("User Not Found");
+                    location.reload();
+                }
+            });
+        });
+
+        $('#myTable').DataTable({ "order": [[3, "desc"]] });
+
+        
+
+    </script>
+}
+
+
+
