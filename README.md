@@ -77,6 +77,8 @@ It is a blog website project which is developed by me on .Net Framework MVC. In 
       </div>
 ```    
    <pre> <img src="/BlogMVC/blogreadme_md/2.PNG/"> </pre>
+   <pre> <img src="/BlogMVC/blogreadme_md/3.PNG/"> </pre>
+
 <strong>View Codes</strong>
 
 ```html
